@@ -11,4 +11,9 @@ Interface input(int row, int col) {
     hold = some tetris piece that we are holding
     next = LinkedList, everytime we put down a piece we append next piece to end of list, and set new head to be the next element.
 }
+
+Working Methods:
+misterhat: Set fixed sized window and read colours of pixels at predefined locations (hard coded)
+
+
 '''
