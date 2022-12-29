@@ -17,5 +17,10 @@ Interface input(int row, int col) {
 Working Methods:
 misterhat: Set fixed sized window and read colours of pixels at predefined locations (hard coded)
            > Minor improvements: take screenshots but be able to determine where main board is without hard coding, find some relation between play area position and window size.
-
 '''
+
+import pyautogui # Screenshot tool
+import numpy as np
+
+image = pyautogui.screenshot()
+
