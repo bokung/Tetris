@@ -5,6 +5,7 @@ Possible Approaches:
 > Keep capturing the screen at every frame and use an algorithm to convert it to a usable representation?
 > Use Tetrio api (Is there even one?)
 > Turn on audio cues in settings at use sounds to determine next piece?
+> Read web socket packages and somehow extract data about board state (how to do?)
 
 Interface input(int row, int col) {
     board => np.array((row, col)) # board[i][j] = 0 if its an empty space, 1 if it has a block. We don't need information about colour of every square.
