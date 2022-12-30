@@ -10,7 +10,7 @@ Possible Approaches:
 
 Interface input(int row, int col) {
     board => np.array((row, col)) # board[i][j] = 0 if its an empty space, 1 if it has a block. We don't need information about colour of every square.
-    hold = some tetris piece that we are holding
+    hold = some tetris piece that we are holding, initialise to null
     next = LinkedList, everytime we put down a piece we append next piece to end of list, and set new head to be the next element.
 }
 
