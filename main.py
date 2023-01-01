@@ -29,5 +29,11 @@ import cv2 as cv
 import numpy as np
 import pyautogui
 
+main_board_img = cv.imread('main_board.png')
+test_img = cv.imread('test_smaller_window.png')
+result = cv.matchTemplate(test_img, main_board_img, cv.TM_CCOEFF)
 
-pyautogui.write("Hello World!", interval=1)
+# cv.imshow('main board', main_board_img)
+# cv.imshow('full screen', test_img)
+# cv.imshow('match', result)
+# cv.waitKey()
