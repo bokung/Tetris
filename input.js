@@ -19,3 +19,5 @@ misterhat: Set fixed sized window and read colours of pixels at predefined locat
            > Minor improvements: take screenshots but be able to determine where main board is without hard coding, find some relation between play area position and window size.
 '''
 */
+
+console.log("Hello world");
