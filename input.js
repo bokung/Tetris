@@ -21,6 +21,7 @@ misterhat: Set fixed sized window and read colours of pixels at predefined locat
 */
 
 // Kinda weird way to import stuff in a mainly functional language, libraries are treated as variables!
+// Functions are exported explicitly and referenced in other files using some object! 
 var robot = require('robotjs');
 
 function sleep(ms) {
@@ -32,7 +33,11 @@ async function getMousePos() {
         await sleep(1000); // wait 1 second
         console.log(robot.getMousePos());
     }
-
 }
 
-getMousePos();
+function humanMovement() {
+    robot.moveMouseSmooth(31, 76);
+}
+
+// getMousePos();
+humanMovement();
