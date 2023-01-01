@@ -17,7 +17,11 @@ Interface input(int row, int col) {
 Working Methods:
 misterhat: Set fixed sized window and read colours of pixels at predefined locations (hard coded, BAD!)
            > Minor improvements: take screenshots but be able to determine where main board is without hard coding, find some relation between play area position and window size.
-'''
+             > Robotjs is too limited in functionality, hard to actually develop anything remotely general and robust.
+
+Confirmed direction:
+> Use OpenCV as input manager to create a resilient tetrio bot that doesn't break whenever the tetrio devs change board size, we change the window size or some other small thing.
+  NO HARDCODING!
 */
 
 // Kinda weird way to import stuff in a mainly functional language, libraries are treated as variables!
