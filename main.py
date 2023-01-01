@@ -35,12 +35,11 @@ result = cv.matchTemplate(test_img, main_board_img, cv.TM_CCOEFF_NORMED)
 
 min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
 
-print('Best match top left position: %s' % str(max_loc))
-print('Best match confidence: %s' % max_val)
-
-
-
+# print('Best match top left position: %s' % str(max_loc))
+# print('Best match confidence: %s' % max_val)
 # cv.imshow('main board', main_board_img)
 # cv.imshow('full screen', test_img)
 # cv.imshow('match', result)
 # cv.waitKey()
+
+pyautogui.mouseInfo()
