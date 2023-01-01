@@ -20,4 +20,7 @@ misterhat: Set fixed sized window and read colours of pixels at predefined locat
 '''
 */
 
+// Kinda weird way to import stuff in a mainly functional language, libraries are treated as variables!
+var robot = require('robotjs');
+
 console.log("Hello world");
