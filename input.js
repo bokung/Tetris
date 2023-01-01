@@ -39,5 +39,12 @@ function humanMovement() {
     robot.moveMouseSmooth(31, 76);
 }
 
-// getMousePos();
-humanMovement();
+function screenshot() {
+    var screen = robot.screen.capture();
+    return screen.colorAt(0,0);
+}
+
+getMousePos();
+// humanMovement();
+// console.log(screenshot());
+// console.log(robot.getScreenSize());
