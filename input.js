@@ -15,7 +15,7 @@ Interface input(int row, int col) {
 }
 
 Working Methods:
-misterhat: Set fixed sized window and read colours of pixels at predefined locations (hard coded)
+misterhat: Set fixed sized window and read colours of pixels at predefined locations (hard coded, BAD!)
            > Minor improvements: take screenshots but be able to determine where main board is without hard coding, find some relation between play area position and window size.
 '''
 */
@@ -23,4 +23,16 @@ misterhat: Set fixed sized window and read colours of pixels at predefined locat
 // Kinda weird way to import stuff in a mainly functional language, libraries are treated as variables!
 var robot = require('robotjs');
 
-console.log("Hello world");
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function getMousePos() {
+    while (true) {
+        await sleep(1000); // wait 1 second
+        console.log(robot.getMousePos());
+    }
+
+}
+
+getMousePos();
