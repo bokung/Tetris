@@ -27,3 +27,7 @@ NO HARDCODING!
 
 import cv2 as cv
 import numpy as np
+import pyautogui
+
+
+pyautogui.write("Hello World!", interval=1)
