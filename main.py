@@ -33,13 +33,19 @@ import pyautogui
 # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
 main_board_template = cv.imread('main_board.png')
 test_img = cv.imread('empty_board.png')
-result = cv.matchTemplate(test_img, main_board_template, cv.TM_CCOEFF_NORMED) 
-min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
 
-s = main_board_template.shape
-top_left = max_loc
-bottom_right = (max_loc[0] + s[1], max_loc[1] + s[0])
+'''
+Returns the top left point and bottom right points of the detected image as two tuples
+'''
+def locate_board(template, fullscreen):
+  result = cv.matchTemplate(fullscreen, template, cv.TM_CCOEFF_NORMED)
+  min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
+  s = template.shape
+  top_left = max_loc
+  bottom_right = (max_loc[0] + s[1], max_loc[1] + s[0])
+  return top_left, bottom_right
 
+top_left, bottom_right = locate_board(main_board_template, test_img)
 cv.rectangle(test_img, top_left, bottom_right, 255, 2)
 cv.imshow('image', test_img)
 cv.waitKey()
@@ -50,5 +56,4 @@ cv.waitKey()
 # cv.imshow('full screen', test_img)
 # cv.imshow('match', result)
 # cv.waitKey()
-
 # pyautogui.mouseInfo()
