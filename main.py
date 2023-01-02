@@ -34,10 +34,14 @@ import pyautogui
 main_board_template = cv.imread('main_board.png')
 test_img = cv.imread('empty_board.png')
 
-'''
-Returns the top left point and bottom right points of the detected image as two tuples
-'''
 def locate_board(template, fullscreen):
+  '''
+  template: Template image to search for (Needle)
+  fullscreen: Space to search for the template (Haystack)
+
+  Returns the top left point and bottom right points of the detected image as two tuples
+  '''
+
   result = cv.matchTemplate(fullscreen, template, cv.TM_CCOEFF_NORMED)
   min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
   s = template.shape
@@ -49,10 +53,13 @@ def locate_board(template, fullscreen):
 
   return top_left, bottom_right
 
+def highlight_board(top_left, bottom_right, board):
+  cv.rectangle(board, top_left, bottom_right, 255, 2)
+  cv.imshow('Highlighted Board Position', board)
+  cv.waitKey()
+
 top_left, bottom_right = locate_board(main_board_template, test_img)
-cv.rectangle(test_img, top_left, bottom_right, 255, 2)
-cv.imshow('image', test_img)
-cv.waitKey()
+highlight_board(top_left, bottom_right, test_img)
 
 # print('Best match top left position: %s' % str(max_loc))
 # print('Best match confidence: %s' % max_val)
