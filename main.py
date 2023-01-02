@@ -29,15 +29,24 @@ import cv2 as cv
 import numpy as np
 import pyautogui
 
-main_board_img = cv.imread('main_board.png')
+# Size of template image matters, matchTemplate is just a 2d convolution, it doesnt come with scaling capabilities unfortunately.
+# To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
+main_board_template = cv.imread('main_board.png')
 test_img = cv.imread('empty_board.png')
-result = cv.matchTemplate(test_img, main_board_img, cv.TM_CCOEFF_NORMED) # Size of template image matters!
-
+result = cv.matchTemplate(test_img, main_board_template, cv.TM_CCOEFF_NORMED) 
 min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
 
-print('Best match top left position: %s' % str(max_loc))
-print('Best match confidence: %s' % max_val)
-# cv.imshow('main board', main_board_img)
+s = main_board_template.shape
+top_left = max_loc
+bottom_right = (max_loc[0] + s[1], max_loc[1] + s[0])
+
+cv.rectangle(test_img, top_left, bottom_right, 255, 2)
+cv.imshow('image', test_img)
+cv.waitKey()
+
+# print('Best match top left position: %s' % str(max_loc))
+# print('Best match confidence: %s' % max_val)
+# cv.imshow('main board', main_board_template)
 # cv.imshow('full screen', test_img)
 # cv.imshow('match', result)
 # cv.waitKey()
