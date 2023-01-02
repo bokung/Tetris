@@ -43,6 +43,10 @@ def locate_board(template, fullscreen):
   s = template.shape
   top_left = max_loc
   bottom_right = (max_loc[0] + s[1], max_loc[1] + s[0])
+
+  if (max_val < 0.8):
+    print('WARNING: Low confidence in board position')
+
   return top_left, bottom_right
 
 top_left, bottom_right = locate_board(main_board_template, test_img)
