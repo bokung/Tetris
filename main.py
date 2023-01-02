@@ -54,7 +54,7 @@ def locate_board(template, fullscreen):
   return top_left, bottom_right
 
 def highlight_board(top_left, bottom_right, board):
-  cv.rectangle(board, top_left, bottom_right, 255, 2)
+  cv.rectangle(board, top_left, bottom_right, color=(0, 0, 255), thickness=2)
   cv.imshow('Highlighted Board Position', board)
   cv.waitKey()
 
