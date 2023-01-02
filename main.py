@@ -32,7 +32,7 @@ import pyautogui
 # Size of template image matters, matchTemplate is just a 2d convolution, it doesnt come with scaling capabilities unfortunately.
 # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
 main_board_template = cv.imread('main_board.png')
-test_img = cv.imread('empty_board.png')
+test_img = cv.imread('test_multi_board.png')
 
 def locate_board(template, fullscreen):
   '''
@@ -66,12 +66,17 @@ def locate_player_board(template, fullscreen, confidence_threshold):
   '''
   result = cv.matchTemplate(fullscreen, template, cv.TM_CCOEFF_NORMED)
   boards = np.where(result >= confidence_threshold)
+  threshold = confidence_threshold
+  while (len(boards[0]) == 0):
+    print('WARNING: Confidence threshold too high, automatically reducing confidence threshold by 0.05')
+    threshold -= 0.05
+    boards = np.where(result >= threshold)
+
   min_position = np.argmin(boards[0]) # Take leftmost board, Player board is always on the left.
   player_board = (boards[0][min_position], boards[1][min_position])
   s = template.shape
   top_left = player_board
   bottom_right = (top_left[0] + s[1], top_left[0] + s[0])
-  
   return top_left, bottom_right
 
 top_left, bottom_right = locate_player_board(main_board_template, test_img, 0.98)
