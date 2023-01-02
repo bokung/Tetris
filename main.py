@@ -30,16 +30,16 @@ import numpy as np
 import pyautogui
 
 main_board_img = cv.imread('main_board.png')
-test_img = cv.imread('test_smaller_window.png')
-result = cv.matchTemplate(test_img, main_board_img, cv.TM_CCOEFF_NORMED)
+test_img = cv.imread('empty_board.png')
+result = cv.matchTemplate(test_img, main_board_img, cv.TM_CCOEFF_NORMED) # Size of template image matters!
 
 min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
 
-# print('Best match top left position: %s' % str(max_loc))
-# print('Best match confidence: %s' % max_val)
+print('Best match top left position: %s' % str(max_loc))
+print('Best match confidence: %s' % max_val)
 # cv.imshow('main board', main_board_img)
 # cv.imshow('full screen', test_img)
 # cv.imshow('match', result)
 # cv.waitKey()
 
-pyautogui.mouseInfo()
+# pyautogui.mouseInfo()
