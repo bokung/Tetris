@@ -41,7 +41,6 @@ def locate_board(template, fullscreen):
 
   Returns the top left point and bottom right points of the detected image as two tuples
   '''
-
   result = cv.matchTemplate(fullscreen, template, cv.TM_CCOEFF_NORMED)
   min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
   s = template.shape
@@ -67,16 +66,16 @@ def locate_player_board(template, fullscreen, confidence_threshold):
   '''
   result = cv.matchTemplate(fullscreen, template, cv.TM_CCOEFF_NORMED)
   boards = np.where(result >= confidence_threshold)
-  player_board = np.min(boards, axis=0) # Take leftmost board, Player board is always on the left.
-  w, h = template.shape
+  min_position = np.argmin(boards[0]) # Take leftmost board, Player board is always on the left.
+  player_board = (boards[0][min_position], boards[1][min_position])
+  s = template.shape
   top_left = player_board
-  bottom_right = (top_left[0] + h, top_left[0] + w)
+  bottom_right = (top_left[0] + s[1], top_left[0] + s[0])
   
   return top_left, bottom_right
 
-
-# top_left, bottom_right = locate_board(main_board_template, test_img)
-# highlight_board(top_left, bottom_right, test_img)
+top_left, bottom_right = locate_player_board(main_board_template, test_img, 0.98)
+highlight_board(top_left, bottom_right, test_img)
 
 # print('Best match top left position: %s' % str(max_loc))
 # print('Best match confidence: %s' % max_val)
