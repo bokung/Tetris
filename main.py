@@ -80,9 +80,14 @@ def locate_player_board(template, fullscreen, confidence_threshold):
   s = template.shape
   top_left = player_board
   bottom_right = (top_left[0] + s[1], top_left[0] + s[0])
+
+  if (confidence_threshold - threshold_decrease < 0.9):
+    print('WARNING: Low confidence in board position')
+
   return top_left, bottom_right
 
-top_left, bottom_right = locate_player_board(main_board_template, test_img, 1)
+# top_left, bottom_right = locate_player_board(main_board_template, test_img, 1)
+top_left, bottom_right = locate_board(main_board_template, test_img)
 highlight_board(top_left, bottom_right, test_img)
 
 # print('Best match top left position: %s' % str(max_loc))
