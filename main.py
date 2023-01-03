@@ -67,10 +67,13 @@ def locate_player_board(template, fullscreen, confidence_threshold):
   result = cv.matchTemplate(fullscreen, template, cv.TM_CCOEFF_NORMED)
   boards = np.where(result >= confidence_threshold)
   threshold = confidence_threshold
+  threshold_decrease = 0
   while (len(boards[0]) == 0):
-    print('WARNING: Confidence threshold too high, automatically reducing confidence threshold by 0.05')
-    threshold -= 0.05
-    boards = np.where(result >= threshold)
+    threshold_decrease += 0.05
+    boards = np.where(result >= confidence_threshold - threshold_decrease)
+  
+  if (threshold_decrease != 0):
+    print('WARNING: Confidence threshold too high, automatically reducing confidence threshold by %s' %threshold_decrease)
 
   min_position = np.argmin(boards[0]) # Take leftmost board, Player board is always on the left.
   player_board = (boards[0][min_position], boards[1][min_position])
