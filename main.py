@@ -80,7 +80,7 @@ def locate_player_board(template, fullscreen, confidence_threshold):
   best_y = np.argmax(results_along_min_x)
   top_left = (min_x, best_y)
   h, w, __ = template.shape
-  bottom_right = (min_x + h, best_y + w)
+  bottom_right = (min_x + w, best_y + h)
 
   if (confidence_threshold - threshold_decrease < 0.9):
     print('WARNING: Low confidence in board position')
