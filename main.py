@@ -34,6 +34,12 @@ import pyautogui
 main_board_template = cv.imread('resources/main_board_no_garbage_template.png', cv.IMREAD_GRAYSCALE)
 empty_black_template = cv.imread('resources/empty_black.png', cv.IMREAD_GRAYSCALE)
 empty_white_template = cv.imread('resources/empty_white.png', cv.IMREAD_GRAYSCALE)
+block_light_template = cv.imread('resources/block_light.png', cv.IMREAD_GRAYSCALE)
+block_medium_template = cv.imread('resources/block_medium.png', cv.IMREAD_GRAYSCALE)
+block_dark_template = cv.imread('resources/block_dark.png', cv.IMREAD_GRAYSCALE)
+preview_template = cv.imread('resources/preview_template.png', cv.IMREAD_GRAYSCALE)
+
+
 test_duel = cv.imread('test/test_duel.png', cv.IMREAD_GRAYSCALE)
 test_empty = cv.imread('test/test_empty.png', cv.IMREAD_GRAYSCALE)
 test_lobby = cv.imread('test/test_lobby.png', cv.IMREAD_GRAYSCALE)
@@ -118,7 +124,7 @@ def locate_player_board(template, fullscreen, confidence_threshold, template_mat
 
 def highlight_squares(cropped_board, template):
   result = cv.matchTemplate(cropped_board, template, cv.TM_SQDIFF_NORMED)
-  detected = list(zip(*np.where(result <= 0.3)[::-1]))
+  detected = list(zip(*np.where(result <= 0.4)[::-1]))
   h, w = template.shape
   for top_left in detected:
     bottom_right = (top_left[0] + w, top_left[1] + h)
@@ -129,8 +135,13 @@ def highlight_squares(cropped_board, template):
 
 test_img = test_lobby
 top_left, bottom_right = locate_player_board(main_board_template, test_img, 0.9, cv.TM_SQDIFF_NORMED)
-cropped = crop_board(top_left, bottom_right, test_img)
-highlight_squares(cropped, empty_black_template)
-highlight_squares(cropped, empty_white_template)
+cropped = crop_board(top_left, bottom_right, test_midgame)
+# highlight_squares(cropped, empty_black_template)
+# highlight_squares(cropped, empty_white_template)
+# highlight_squares(cropped, block_light_template)
+# highlight_squares(cropped, block_medium_template)
+# highlight_squares(cropped, block_dark_template)
+highlight_squares(cropped, preview_template)
+
 cv.imshow('cropped', cropped)
 cv.waitKey()
