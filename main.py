@@ -32,6 +32,8 @@ import pyautogui
 # Size of template image matters, matchTemplate is just a 2d convolution, computing the difference using some function, it doesnt come with scaling capabilities unfortunately.
 # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
 main_board_template = cv.imread('resources/main_board_no_garbage_template.png', cv.IMREAD_GRAYSCALE)
+empty_black_template = cv.imread('resources/empty_black.png', cv.IMREAD_GRAYSCALE)
+empty_white_template = cv.imread('resources/empty_white.png', cv.IMREAD_GRAYSCALE)
 test_duel = cv.imread('test/test_duel.png', cv.IMREAD_GRAYSCALE)
 test_empty = cv.imread('test/test_empty.png', cv.IMREAD_GRAYSCALE)
 test_lobby = cv.imread('test/test_lobby.png', cv.IMREAD_GRAYSCALE)
@@ -114,18 +116,21 @@ def locate_player_board(template, fullscreen, confidence_threshold, template_mat
   bottom_right = (min_x + w, best_y + h)
   return top_left, bottom_right
 
-# top_left, bottom_right = locate_player_board(main_board_template, test_img, 1)
-test_img = test_duel
+def highlight_squares(cropped_board, template):
+  result = cv.matchTemplate(cropped_board, template, cv.TM_SQDIFF_NORMED)
+  detected = list(zip(*np.where(result <= 0.3)[::-1]))
+  h, w = template.shape
+  for top_left in detected:
+    bottom_right = (top_left[0] + w, top_left[1] + h)
+    cv.rectangle(cropped, top_left, bottom_right, color=(255,0,0), thickness=1)
+  # cv.imshow('cropped', cropped_board)
+  # cv.waitKey()
+
+
+test_img = test_lobby
 top_left, bottom_right = locate_player_board(main_board_template, test_img, 0.9, cv.TM_SQDIFF_NORMED)
-# highlight_board(top_left, bottom_right, test_img)
 cropped = crop_board(top_left, bottom_right, test_img)
+highlight_squares(cropped, empty_black_template)
+highlight_squares(cropped, empty_white_template)
 cv.imshow('cropped', cropped)
 cv.waitKey()
-# print('hello')
-# cv.imshow('cropped', crop_board(top_left, bottom_right, test_img))
-# print('Best match top left position: %s' % str(max_loc))
-# print('Best match confidence: %s' % max_val)
-# cv.imshow('main board', main_board_template)
-# cv.imshow('full screen', test_img)
-# cv.imshow('match', result)
-# cv.waitKey()
