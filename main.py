@@ -31,8 +31,8 @@ import pyautogui
 
 # Size of template image matters, matchTemplate is just a 2d convolution, it doesnt come with scaling capabilities unfortunately.
 # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
-main_board_template = cv.imread('main_board.png')
-test_img = cv.imread('test/test_main_board.png')
+main_board_template = cv.imread('main_board.png', cv.IMREAD_GRAYSCALE)
+test_img = cv.imread('test/test_main_board.png', cv.IMREAD_GRAYSCALE)
 
 def locate_board(template, fullscreen):
   '''
@@ -60,35 +60,52 @@ def highlight_board(top_left, bottom_right, board):
   cv.imshow('Highlighted Board Position', board)
   cv.waitKey()
 
-def locate_player_board(template, fullscreen, confidence_threshold):
+def lower_is_better_checker(match_template_mode):
+  if (match_template_mode is cv.TM_SQDIFF or cv.TM_SQDIFF_NORMED):
+    return True
+  else:
+    return False
+
+def locate_player_board(template, fullscreen, confidence_threshold, template_match_mode):
   '''
   Use this to locate board when there are more than one board on the screen, e.g. in a 1v1 duel or a multiplayer lobby
   '''
-  result = cv.matchTemplate(fullscreen, template, cv.TM_CCOEFF_NORMED)
-  boards = np.where(result >= confidence_threshold)
-  threshold = confidence_threshold
-  threshold_decrease = 0
-  while (len(boards[0]) == 0):
-    threshold_decrease += 0.05
-    boards = np.where(result >= confidence_threshold - threshold_decrease)
-  
-  if (threshold_decrease != 0):
-    print('WARNING: Confidence threshold too high, automatically reducing confidence threshold by %s' %threshold_decrease)
+  result = cv.matchTemplate(fullscreen, template, template_match_mode)
+  lower_is_better = lower_is_better_checker(template_match_mode)
 
+  if (lower_is_better):
+    threshold = 1 - confidence_threshold
+    boards = np.where(result <= threshold)
+    threshold_increase = 0
+    while (len(boards[0]) == 0):
+      threshold_increase += 0.05
+      boards = np.where(result <= threshold + threshold_increase)
+    if (threshold_increase != 0):
+      print('WARNING: Confidence threshold too high, automatically reducing confidence threshold by %s' %threshold_increase)
+    if (1 - threshold - threshold_increase < 0.8):
+      print('WARNING: Low confidence in board position')
+  else:
+    boards = np.where(result >= confidence_threshold)
+    threshold = confidence_threshold
+    threshold_decrease = 0
+    while (len(boards[0]) == 0):
+      threshold_decrease += 0.05
+      boards = np.where(result >= confidence_threshold - threshold_decrease)
+    if (threshold_decrease != 0):
+      print('WARNING: Confidence threshold too high, automatically reducing confidence threshold by %s' %threshold_decrease)
+    if (confidence_threshold - threshold_decrease < 0.9):
+      print('WARNING: Low confidence in board position')
+  
   min_x = np.min(boards[1]) # Take leftmost board, Player board is always on the left.
   results_along_min_x = result[:, min_x]
-  best_y = np.argmax(results_along_min_x)
+  best_y = np.argmin(results_along_min_x) if lower_is_better else np.argmax(results_along_min_x)
   top_left = (min_x, best_y)
-  h, w, __ = template.shape
+  h, w = template.shape
   bottom_right = (min_x + w, best_y + h)
-
-  if (confidence_threshold - threshold_decrease < 0.9):
-    print('WARNING: Low confidence in board position')
-
   return top_left, bottom_right
 
 # top_left, bottom_right = locate_player_board(main_board_template, test_img, 1)
-top_left, bottom_right = locate_player_board(main_board_template, test_img, 0.9)
+top_left, bottom_right = locate_player_board(main_board_template, test_img, 0.9, cv.TM_CCOEFF_NORMED)
 highlight_board(top_left, bottom_right, test_img)
 s = test_img.shape
 
