@@ -29,10 +29,11 @@ import cv2 as cv
 import numpy as np
 import pyautogui
 
-# Size of template image matters, matchTemplate is just a 2d convolution, it doesnt come with scaling capabilities unfortunately.
+# Size of template image matters, matchTemplate is just a 2d convolution, computing the difference using some function, it doesnt come with scaling capabilities unfortunately.
 # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
-main_board_template = cv.imread('main_board.png')
-test_img = cv.imread('test/test_duel.png')
+main_board_template = cv.imread('main_board_template.png')
+test_duel = cv.imread('test/test_duel.png')
+test_empty = cv.imread('test/test_empty')
 
 def locate_board(template, fullscreen):
   '''
@@ -73,6 +74,7 @@ def locate_player_board(template, fullscreen, confidence_threshold, template_mat
   result = cv.matchTemplate(fullscreen, template, template_match_mode)
   lower_is_better = lower_is_better_checker(template_match_mode)
 
+  # A lot of repeated code! Can cut down?
   if (lower_is_better):
     threshold = 1 - confidence_threshold
     boards = np.where(result <= threshold)
@@ -107,7 +109,6 @@ def locate_player_board(template, fullscreen, confidence_threshold, template_mat
 # top_left, bottom_right = locate_player_board(main_board_template, test_img, 1)
 top_left, bottom_right = locate_player_board(main_board_template, test_img, 0.9, cv.TM_SQDIFF_NORMED)
 highlight_board(top_left, bottom_right, test_img)
-s = test_img.shape
 
 # print('Best match top left position: %s' % str(max_loc))
 # print('Best match confidence: %s' % max_val)
