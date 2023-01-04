@@ -31,11 +31,11 @@ import pyautogui
 
 # Size of template image matters, matchTemplate is just a 2d convolution, computing the difference using some function, it doesnt come with scaling capabilities unfortunately.
 # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
-main_board_template = cv.imread('main_board_no_garbage_template.png')
-test_duel = cv.imread('test/test_duel.png')
-test_empty = cv.imread('test/test_empty.png')
-test_lobby = cv.imread('test/test_lobby.png')
-test_midgame = cv.imread('test/test_midgame.png')
+main_board_template = cv.imread('main_board_no_garbage_template.png', cv.IMREAD_GRAYSCALE)
+test_duel = cv.imread('test/test_duel.png', cv.IMREAD_GRAYSCALE)
+test_empty = cv.imread('test/test_empty.png', cv.IMREAD_GRAYSCALE)
+test_lobby = cv.imread('test/test_lobby.png', cv.IMREAD_GRAYSCALE)
+test_midgame = cv.imread('test/test_midgame.png', cv.IMREAD_GRAYSCALE)
 
 def locate_board(template, fullscreen):
   '''
@@ -61,6 +61,7 @@ def highlight_board(top_left, bottom_right, board):
   '''
   cv.rectangle(board, top_left, bottom_right, color=(0, 0, 255), thickness=2)
   cv.imshow('Highlighted Board Position', board)
+  # pyautogui.mouseInfo()
   cv.waitKey()
 
 def lower_is_better_checker(match_template_mode):
@@ -104,7 +105,8 @@ def locate_player_board(template, fullscreen, confidence_threshold, template_mat
   results_along_min_x = result[:, min_x]
   best_y = np.argmin(results_along_min_x) if lower_is_better else np.argmax(results_along_min_x)
   top_left = (min_x, best_y)
-  h, w, __ = template.shape
+  h = template.shape[0]
+  w = template.shape[1]
   bottom_right = (min_x + w, best_y + h)
   return top_left, bottom_right
 
@@ -119,4 +121,3 @@ highlight_board(top_left, bottom_right, test_img)
 # cv.imshow('full screen', test_img)
 # cv.imshow('match', result)
 # cv.waitKey()
-# pyautogui.mouseInfo()
