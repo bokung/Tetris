@@ -28,6 +28,11 @@ NO HARDCODING!
 import cv2 as cv
 import numpy as np
 import pyautogui
+import copy
+
+# Initial Global Parameters
+ROWS = 20
+COLUMNS = 10
 
 # Size of template image matters, matchTemplate is just a 2d convolution, computing the difference using some function, it doesnt come with scaling capabilities unfortunately.
 # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
@@ -38,7 +43,6 @@ block_light_template = cv.imread('resources/block_light.png', cv.IMREAD_GRAYSCAL
 block_medium_template = cv.imread('resources/block_medium.png', cv.IMREAD_GRAYSCALE)
 block_dark_template = cv.imread('resources/block_dark.png', cv.IMREAD_GRAYSCALE)
 preview_template = cv.imread('resources/preview_template.png', cv.IMREAD_GRAYSCALE)
-
 
 test_duel = cv.imread('test/test_duel.png', cv.IMREAD_GRAYSCALE)
 test_empty = cv.imread('test/test_empty.png', cv.IMREAD_GRAYSCALE)
@@ -124,24 +128,34 @@ def locate_player_board(template, fullscreen, confidence_threshold, template_mat
 
 def highlight_squares(cropped_board, template):
   result = cv.matchTemplate(cropped_board, template, cv.TM_SQDIFF_NORMED)
-  detected = list(zip(*np.where(result <= 0.4)[::-1]))
+  detected = list(zip(*np.where(result <= 0.2)[::-1]))
   h, w = template.shape
   for top_left in detected:
     bottom_right = (top_left[0] + w, top_left[1] + h)
-    cv.rectangle(cropped, top_left, bottom_right, color=(255,0,0), thickness=1)
+    cv.rectangle(cropped_board, top_left, bottom_right, color=(255,0,0), thickness=1)
   # cv.imshow('cropped', cropped_board)
   # cv.waitKey()
+
+def board_state(cropped_board, board_template):
+  h, w = board_template.shape
+  y_div = h/ROWS
+  x_div = w/COLUMNS
+  result_light = cv.matchTemplate(cropped_board, block_light_template, cv.TM_SQDIFF_NORMED)
+  result_medium = cv.matchTemplate(cropped_board, block_medium_template, cv.TM_SQDIFF_NORMED)
+  result_dark = cv.matchTemplate(cropped_board, block_dark_template, cv.TM_SQDIFF_NORMED)
+  
 
 
 test_img = test_lobby
 top_left, bottom_right = locate_player_board(main_board_template, test_img, 0.9, cv.TM_SQDIFF_NORMED)
 cropped = crop_board(top_left, bottom_right, test_midgame)
+original = copy.deepcopy(cropped)
 # highlight_squares(cropped, empty_black_template)
 # highlight_squares(cropped, empty_white_template)
-# highlight_squares(cropped, block_light_template)
-# highlight_squares(cropped, block_medium_template)
-# highlight_squares(cropped, block_dark_template)
-highlight_squares(cropped, preview_template)
-
-cv.imshow('cropped', cropped)
+highlight_squares(cropped, block_light_template)
+highlight_squares(cropped, block_medium_template)
+highlight_squares(cropped, block_dark_template)
+# highlight_squares(cropped, preview_template)
+cv.imshow('original', original)
+cv.imshow('colored', cropped)
 cv.waitKey()
