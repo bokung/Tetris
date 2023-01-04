@@ -31,7 +31,7 @@ import pyautogui
 
 # Size of template image matters, matchTemplate is just a 2d convolution, computing the difference using some function, it doesnt come with scaling capabilities unfortunately.
 # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
-main_board_template = cv.imread('main_board_no_garbage_template.png', cv.IMREAD_GRAYSCALE)
+main_board_template = cv.imread('resources/main_board_no_garbage_template.png', cv.IMREAD_GRAYSCALE)
 test_duel = cv.imread('test/test_duel.png', cv.IMREAD_GRAYSCALE)
 test_empty = cv.imread('test/test_empty.png', cv.IMREAD_GRAYSCALE)
 test_lobby = cv.imread('test/test_lobby.png', cv.IMREAD_GRAYSCALE)
@@ -59,7 +59,7 @@ def highlight_board(top_left, bottom_right, board):
   '''
   Highlights the detected board location
   '''
-  cv.rectangle(board, top_left, bottom_right, color=(0, 0, 255), thickness=2)
+  cv.rectangle(board, top_left, bottom_right, color=(0, 0, 0), thickness=2)
   cv.imshow('Highlighted Board Position', board)
   # pyautogui.mouseInfo()
   cv.waitKey()
@@ -69,6 +69,10 @@ def lower_is_better_checker(match_template_mode):
     return True
   else:
     return False
+
+def crop_board(top_left, bottom_right, fullscreen):
+  cropped = fullscreen[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
+  return cropped
 
 def locate_player_board(template, fullscreen, confidence_threshold, template_match_mode):
   '''
@@ -113,8 +117,12 @@ def locate_player_board(template, fullscreen, confidence_threshold, template_mat
 # top_left, bottom_right = locate_player_board(main_board_template, test_img, 1)
 test_img = test_duel
 top_left, bottom_right = locate_player_board(main_board_template, test_img, 0.9, cv.TM_SQDIFF_NORMED)
-highlight_board(top_left, bottom_right, test_img)
-
+# highlight_board(top_left, bottom_right, test_img)
+cropped = crop_board(top_left, bottom_right, test_img)
+cv.imshow('cropped', cropped)
+cv.waitKey()
+# print('hello')
+# cv.imshow('cropped', crop_board(top_left, bottom_right, test_img))
 # print('Best match top left position: %s' % str(max_loc))
 # print('Best match confidence: %s' % max_val)
 # cv.imshow('main board', main_board_template)
