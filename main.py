@@ -172,46 +172,22 @@ def visualise_board_state(board_state):
         img[int(r*y_div):int((r+1)*y_div-1), int(c*x_div):int((c+1)*x_div-1)] = 255
   return img
 
-def bot_vision():
+def launch_bot_vision_window():
+  # Run once to detect board location at the start of the game when we have an empty board
   screenshot = pyautogui.screenshot()
   fullscreen = np.array(screenshot)
-  fullscreen = cv.cvtColor(fullscreen, cv.COLOR_BGR2GRAY)
-  # top_left, bottom_right = locate_player_board(TEMPLATE_main_board, fullscreen, 0.99, cv.TM_SQDIFF_NORMED)
-  top_left, bottom_right = locate_player_board(TEMPLATE_main_board, fullscreen)
+  fullscreen = cv.cvtColor(fullscreen, cv.COLOR_RGB2GRAY)
+  top_left, bottom_right = locate_player_board(TEMPLATE_main_board, fullscreen, 0.99, cv.TM_SQDIFF_NORMED)
+
   while (True):
     screenshot = pyautogui.screenshot()
-    fullscreen = np.array(screenshot)
+    fullscreen = np.array(screenshot) # Default behaviour is a RGB picture for pyautogui screen capture. Images in OpenCV are stored in BGR format.
     fullscreen = cv.cvtColor(fullscreen, cv.COLOR_RGB2GRAY)
     cropped = crop_board(top_left, bottom_right, fullscreen)
     board = board_state(cropped)
-    bot_eyes = visualise_board_state(board)
-    cv.imshow('Cropped', cropped)
-    cv.imshow('Hello', bot_eyes)
-    if cv.waitKey(1) == ord('q'):
+    board_visualisation = visualise_board_state(board)
+    cv.imshow('Original Board', cropped)
+    cv.imshow('Detected Board State', board_visualisation)
+    if cv.waitKey(1) == ord('q'): # Wait 1ms, press q to quit
       cv.destroyAllWindows()
       break
-
-# test_img = test_block_detection
-top_left, bottom_right = locate_player_board(TEMPLATE_main_board, test_empty_low, 0.9, cv.TM_SQDIFF_NORMED)
-cropped = crop_board(top_left, bottom_right, test_zen)
-cv.imshow('bot', visualise_board_state(board_state(cropped)))
-cv.imshow('cropped', cropped)
-cv.waitKey()
-# bot_vision()
-
-
-# cv.imshow('What bot sees', visualise_board_state(board_state))
-# cv.waitKey()
-
-# highlight_squares(cropped, TEMPLATE_empty_low_quality_no_border)
-# cv.imshow('cropped', cropped)
-# cv.waitKey()
-# # highlight_squares(cropped, empty_black_template)
-# # highlight_squares(cropped, empty_white_template)
-# highlight_squares(cropped, block_light_template)
-# highlight_squares(cropped, block_medium_template)
-# highlight_squares(cropped, block_dark_template)
-# highlight_squares(cropped, preview_template)
-# cv.imshow('original', original)
-# cv.imshow('colored', cropped)
-# cv.waitKey()
