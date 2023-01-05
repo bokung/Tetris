@@ -149,12 +149,16 @@ def board_state(cropped_board):
   y_div = h/ROWS
   x_div = w/COLUMNS
   board = np.full((ROWS, COLUMNS), True) # Initialise to true, board detector will set detected empty squares to false.
-  result = cv.matchTemplate(cropped_board, TEMPLATE_empty_low_quality_no_border, cv.TM_SQDIFF_NORMED)
-  detected_empty = list(zip(*np.where(result <= 0.000001)[::-1])) # Returns a list of tuples of detected squares.
+  result = cv.matchTemplate(cropped_board, TEMPLATE_empty_low_quality_no_border, cv.TM_CCORR_NORMED)
+  # detected_empty = list(zip(*np.where(result <= 0.000001)[::-1])) # Returns a list of tuples of detected squares, for Squared difference comparison
+  detected_empty = list(zip(*np.where(result >= 0.999)[::-1]))
   for point in detected_empty:
     x, y = point
-    r = int(y/y_div)
-    c = int(x/x_div)
+    r = round(y/y_div)
+    c = round(x/x_div)
+    # if (r == 18 and c == 9):
+    #   r_nonround = y/y_div
+    #   c_nonround = x/x_div
     board[r][c] = False
   return board
 
@@ -169,9 +173,8 @@ def visualise_board_state(board_state):
         img[int(r*y_div):int((r+1)*y_div-1), int(c*x_div):int((c+1)*x_div-1)] = 255
   return img
 
-
 test_img = test_block_detection
-top_left, bottom_right = locate_player_board(TEMPLATE_main_board, test_lobby, 0.9, cv.TM_SQDIFF_NORMED)
+top_left, bottom_right = locate_player_board(TEMPLATE_main_board, test_lobby, 0.99, cv.TM_SQDIFF_NORMED)
 cropped = crop_board(top_left, bottom_right, test_img)
 board_state = board_state(cropped)
 print(board_state)
