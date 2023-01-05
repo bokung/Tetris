@@ -150,7 +150,7 @@ def board_state(cropped_board):
   x_div = w/COLUMNS
   board = np.full((ROWS, COLUMNS), True) # Initialise to true, board detector will set detected empty squares to false.
   result = cv.matchTemplate(cropped_board, TEMPLATE_empty_low_quality_no_border, cv.TM_SQDIFF_NORMED)
-  detected_empty = list(zip(*np.where(result <= 0.1)[::-1])) # Returns a list of tuples of detected squares.
+  detected_empty = list(zip(*np.where(result <= 0.000001)[::-1])) # Returns a list of tuples of detected squares.
   for point in detected_empty:
     x, y = point
     r = int(y/y_div)
