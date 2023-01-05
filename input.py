@@ -36,7 +36,7 @@ COLUMNS = 10
 
 # Size of template image matters, matchTemplate is just a 2d convolution, computing the difference using some function, it doesnt come with scaling capabilities unfortunately.
 # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
-TEMPLATE_main_board = cv.imread('resources/main_board_no_garbage_template.png', cv.IMREAD_GRAYSCALE)
+TEMPLATE_main_board = cv.imread('resources/main_board_template.png', cv.IMREAD_GRAYSCALE)
 TEMPLATE_empty_black = cv.imread('resources/empty_black.png', cv.IMREAD_GRAYSCALE)
 TEMPLATE_empty_white = cv.imread('resources/empty_white.png', cv.IMREAD_GRAYSCALE)
 TEMPLATE_empty_low_quality = cv.imread('resources/empty_low_quality.png', cv.IMREAD_GRAYSCALE)
@@ -151,13 +151,19 @@ def board_state(cropped_board):
   y_div = h/ROWS
   x_div = w/COLUMNS
   board = np.full((ROWS, COLUMNS), True) # Initialise to true, board detector will set detected empty squares to false.
-  result = cv.matchTemplate(cropped_board, TEMPLATE_empty_low_quality_no_border, cv.TM_CCORR_NORMED)
+  result = cv.matchTemplate(cropped_board, TEMPLATE_empty_low_quality_no_border, cv.TM_CCOEFF_NORMED)
   # detected_empty = list(zip(*np.where(result <= 0.000001)[::-1])) # Returns a list of tuples of detected squares, for Squared difference comparison
   detected_empty = list(zip(*np.where(result >= 0.99)[::-1]))
   for point in detected_empty:
     x, y = point
+    # r = min(round(y/y_div), ROWS - 1)
+    # c = min(round(x/x_div), COLUMNS - 1)
     r = round(y/y_div)
     c = round(x/x_div)
+    
+    if (r <= -1 or r >= 20 or c <= -1 or c >= 10):
+      print("BAD THINGS HAPPENING!!!")
+
     board[r, c] = False
   return board
 
@@ -191,3 +197,5 @@ def launch_bot_vision_window():
     if cv.waitKey(1) == ord('q'): # Wait 1ms, press q to quit
       cv.destroyAllWindows()
       break
+
+launch_bot_vision_window()
