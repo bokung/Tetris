@@ -139,20 +139,32 @@ def highlight_squares(cropped_board, template):
   # cv.imshow('cropped', cropped_board)
   # cv.waitKey()
 
-def board_state(cropped_board, board_template):
-  h, w = board_template.shape
-  y_div = int(h/ROWS)
-  x_div = int(w/COLUMNS)
-  result_light = cv.matchTemplate(cropped_board, TEMPLATE_block_light, cv.TM_SQDIFF_NORMED)
-  result_medium = cv.matchTemplate(cropped_board, TEMPLATE_block_medium, cv.TM_SQDIFF_NORMED)
-  result_dark = cv.matchTemplate(cropped_board, TEMPLATE_block_dark, cv.TM_SQDIFF_NORMED)
+def board_state(cropped_board):
+  '''
+  Only works when we do it on low settings! 
+  Internally implemented as a template matching problem and we are using the low quality square block as reference.
+  Returns a (ROW, COLUMN) ndarray of booleans, True means block is filled, False means block is empty.
+  '''
+  h, w = TEMPLATE_main_board.shape
+  y_div = h/ROWS
+  x_div = w/COLUMNS
+  board = np.full((ROWS, COLUMNS), True) # Initialise to true, board detector will set detected empty squares to false.
+  result = cv.matchTemplate(cropped_board, TEMPLATE_empty_low_quality_no_border, cv.TM_SQDIFF_NORMED)
+  detected_empty = list(zip(*np.where(result <= 0.2)[::-1])) # Returns a list of tuples of detected squares.
+  for point in detected_empty:
+    x, y = point
+    r = ROWS - 1 - int(y/y_div)
+    c = COLUMNS - 1 - int(x/x_div)
+    board[r][c] = False
+  return board
 
 test_img = test_block_detection
 top_left, bottom_right = locate_player_board(TEMPLATE_main_board, test_lobby, 0.9, cv.TM_SQDIFF_NORMED)
-cropped = crop_board(top_left, bottom_right, test_img)
-highlight_squares(cropped, TEMPLATE_empty_low_quality_no_border)
-cv.imshow('cropped', cropped)
-cv.waitKey()
+
+# cropped = crop_board(top_left, bottom_right, test_img)
+# highlight_squares(cropped, TEMPLATE_empty_low_quality_no_border)
+# cv.imshow('cropped', cropped)
+# cv.waitKey()
 # # highlight_squares(cropped, empty_black_template)
 # # highlight_squares(cropped, empty_white_template)
 # highlight_squares(cropped, block_light_template)
