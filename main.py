@@ -170,7 +170,12 @@ def visualise_board_state(board_state):
         img[int(r*y_div):int((r+1)*y_div-1), int(c*x_div):int((c+1)*x_div-1)] = 255
   return img
 
-def bot_vision(top_left, bottom_right):
+def bot_vision():
+  screenshot = pyautogui.screenshot()
+  fullscreen = np.array(screenshot)
+  fullscreen = cv.cvtColor(fullscreen, cv.COLOR_BGR2GRAY)
+  # top_left, bottom_right = locate_player_board(TEMPLATE_main_board, fullscreen, 0.99, cv.TM_SQDIFF_NORMED)
+  top_left, bottom_right = locate_board(TEMPLATE_main_board, fullscreen)
   while (True):
     screenshot = pyautogui.screenshot()
     fullscreen = np.array(screenshot)
@@ -187,9 +192,9 @@ def bot_vision(top_left, bottom_right):
     # cv.imshow('What bot sees', visualise_board_state(board_state))
 
 
-test_img = test_block_detection
-top_left, bottom_right = locate_player_board(TEMPLATE_main_board, test_lobby, 0.99, cv.TM_SQDIFF_NORMED)
-bot_vision(top_left, bottom_right)
+# test_img = test_block_detection
+# top_left, bottom_right = locate_player_board(TEMPLATE_main_board, test_lobby, 0.99, cv.TM_SQDIFF_NORMED)
+bot_vision()
 
 
 # cv.imshow('What bot sees', visualise_board_state(board_state))
