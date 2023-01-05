@@ -36,18 +36,21 @@ COLUMNS = 10
 
 # Size of template image matters, matchTemplate is just a 2d convolution, computing the difference using some function, it doesnt come with scaling capabilities unfortunately.
 # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
-main_board_template = cv.imread('resources/main_board_no_garbage_template.png', cv.IMREAD_GRAYSCALE)
-empty_black_template = cv.imread('resources/empty_black.png', cv.IMREAD_GRAYSCALE)
-empty_white_template = cv.imread('resources/empty_white.png', cv.IMREAD_GRAYSCALE)
-block_light_template = cv.imread('resources/block_light.png', cv.IMREAD_GRAYSCALE)
-block_medium_template = cv.imread('resources/block_medium.png', cv.IMREAD_GRAYSCALE)
-block_dark_template = cv.imread('resources/block_dark.png', cv.IMREAD_GRAYSCALE)
-preview_template = cv.imread('resources/preview_template.png', cv.IMREAD_GRAYSCALE)
+TEMPLATE_main_board = cv.imread('resources/main_board_no_garbage_template.png', cv.IMREAD_GRAYSCALE)
+TEMPLATE_empty_black = cv.imread('resources/empty_black.png', cv.IMREAD_GRAYSCALE)
+TEMPLATE_empty_white = cv.imread('resources/empty_white.png', cv.IMREAD_GRAYSCALE)
+TEMPLATE_empty_low_quality = cv.imread('resources/empty_low_quality.png', cv.IMREAD_GRAYSCALE)
+TEMPLATE_empty_low_quality_no_border = cv.imread('resources/empty_no_border.png', cv.IMREAD_GRAYSCALE)
+TEMPLATE_block_light = cv.imread('resources/block_light.png', cv.IMREAD_GRAYSCALE)
+TEMPLATE_block_medium = cv.imread('resources/block_medium.png', cv.IMREAD_GRAYSCALE)
+TEMPLATE_block_dark = cv.imread('resources/block_dark.png', cv.IMREAD_GRAYSCALE)
+TEMPLATE_preview = cv.imread('resources/preview_template.png', cv.IMREAD_GRAYSCALE)
 
 test_duel = cv.imread('test/test_duel.png', cv.IMREAD_GRAYSCALE)
 test_empty = cv.imread('test/test_empty.png', cv.IMREAD_GRAYSCALE)
 test_lobby = cv.imread('test/test_lobby.png', cv.IMREAD_GRAYSCALE)
 test_midgame = cv.imread('test/test_midgame.png', cv.IMREAD_GRAYSCALE)
+test_block_detection = cv.imread('test/test_block_detection.png', cv.IMREAD_GRAYSCALE)
 
 def locate_board(template, fullscreen):
   '''
@@ -138,24 +141,24 @@ def highlight_squares(cropped_board, template):
 
 def board_state(cropped_board, board_template):
   h, w = board_template.shape
-  y_div = h/ROWS
-  x_div = w/COLUMNS
-  result_light = cv.matchTemplate(cropped_board, block_light_template, cv.TM_SQDIFF_NORMED)
-  result_medium = cv.matchTemplate(cropped_board, block_medium_template, cv.TM_SQDIFF_NORMED)
-  result_dark = cv.matchTemplate(cropped_board, block_dark_template, cv.TM_SQDIFF_NORMED)
-  
+  y_div = int(h/ROWS)
+  x_div = int(w/COLUMNS)
+  result_light = cv.matchTemplate(cropped_board, TEMPLATE_block_light, cv.TM_SQDIFF_NORMED)
+  result_medium = cv.matchTemplate(cropped_board, TEMPLATE_block_medium, cv.TM_SQDIFF_NORMED)
+  result_dark = cv.matchTemplate(cropped_board, TEMPLATE_block_dark, cv.TM_SQDIFF_NORMED)
 
-
-test_img = test_lobby
-top_left, bottom_right = locate_player_board(main_board_template, test_img, 0.9, cv.TM_SQDIFF_NORMED)
-cropped = crop_board(top_left, bottom_right, test_midgame)
-original = copy.deepcopy(cropped)
-# highlight_squares(cropped, empty_black_template)
-# highlight_squares(cropped, empty_white_template)
-highlight_squares(cropped, block_light_template)
-highlight_squares(cropped, block_medium_template)
-highlight_squares(cropped, block_dark_template)
-# highlight_squares(cropped, preview_template)
-cv.imshow('original', original)
-cv.imshow('colored', cropped)
+test_img = test_block_detection
+top_left, bottom_right = locate_player_board(TEMPLATE_main_board, test_lobby, 0.9, cv.TM_SQDIFF_NORMED)
+cropped = crop_board(top_left, bottom_right, test_img)
+highlight_squares(cropped, TEMPLATE_empty_low_quality_no_border)
+cv.imshow('cropped', cropped)
 cv.waitKey()
+# # highlight_squares(cropped, empty_black_template)
+# # highlight_squares(cropped, empty_white_template)
+# highlight_squares(cropped, block_light_template)
+# highlight_squares(cropped, block_medium_template)
+# highlight_squares(cropped, block_dark_template)
+# highlight_squares(cropped, preview_template)
+# cv.imshow('original', original)
+# cv.imshow('colored', cropped)
+# cv.waitKey()
