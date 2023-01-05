@@ -48,9 +48,11 @@ TEMPLATE_preview = cv.imread('resources/preview_template.png', cv.IMREAD_GRAYSCA
 
 test_duel = cv.imread('test/test_duel.png', cv.IMREAD_GRAYSCALE)
 test_empty = cv.imread('test/test_empty.png', cv.IMREAD_GRAYSCALE)
+test_empty_low = cv.imread('test/test_empty_low.png', cv.IMREAD_GRAYSCALE)
 test_lobby = cv.imread('test/test_lobby.png', cv.IMREAD_GRAYSCALE)
 test_midgame = cv.imread('test/test_midgame.png', cv.IMREAD_GRAYSCALE)
 test_block_detection = cv.imread('test/test_block_detection.png', cv.IMREAD_GRAYSCALE)
+test_zen = cv.imread('test/test_zen.png', cv.IMREAD_GRAYSCALE)
 
 def locate_board(template, fullscreen):
   '''
@@ -151,12 +153,12 @@ def board_state(cropped_board):
   board = np.full((ROWS, COLUMNS), True) # Initialise to true, board detector will set detected empty squares to false.
   result = cv.matchTemplate(cropped_board, TEMPLATE_empty_low_quality_no_border, cv.TM_CCORR_NORMED)
   # detected_empty = list(zip(*np.where(result <= 0.000001)[::-1])) # Returns a list of tuples of detected squares, for Squared difference comparison
-  detected_empty = list(zip(*np.where(result >= 0.999)[::-1]))
+  detected_empty = list(zip(*np.where(result >= 0.99)[::-1]))
   for point in detected_empty:
     x, y = point
     r = round(y/y_div)
     c = round(x/x_div)
-    board[r][c] = False
+    board[r, c] = False
   return board
 
 def visualise_board_state(board_state):
@@ -175,26 +177,27 @@ def bot_vision():
   fullscreen = np.array(screenshot)
   fullscreen = cv.cvtColor(fullscreen, cv.COLOR_BGR2GRAY)
   # top_left, bottom_right = locate_player_board(TEMPLATE_main_board, fullscreen, 0.99, cv.TM_SQDIFF_NORMED)
-  top_left, bottom_right = locate_board(TEMPLATE_main_board, fullscreen)
+  top_left, bottom_right = locate_player_board(TEMPLATE_main_board, fullscreen)
   while (True):
     screenshot = pyautogui.screenshot()
     fullscreen = np.array(screenshot)
-    fullscreen = cv.cvtColor(fullscreen, cv.COLOR_BGR2GRAY)
+    fullscreen = cv.cvtColor(fullscreen, cv.COLOR_RGB2GRAY)
     cropped = crop_board(top_left, bottom_right, fullscreen)
     board = board_state(cropped)
     bot_eyes = visualise_board_state(board)
+    cv.imshow('Cropped', cropped)
     cv.imshow('Hello', bot_eyes)
     if cv.waitKey(1) == ord('q'):
       cv.destroyAllWindows()
       break
-    # cropped = crop_board(top_left, bottom_right, fullscreen)
-    # board_state = board_state(cropped)
-    # cv.imshow('What bot sees', visualise_board_state(board_state))
-
 
 # test_img = test_block_detection
-# top_left, bottom_right = locate_player_board(TEMPLATE_main_board, test_lobby, 0.99, cv.TM_SQDIFF_NORMED)
-bot_vision()
+top_left, bottom_right = locate_player_board(TEMPLATE_main_board, test_empty_low, 0.9, cv.TM_SQDIFF_NORMED)
+cropped = crop_board(top_left, bottom_right, test_zen)
+cv.imshow('bot', visualise_board_state(board_state(cropped)))
+cv.imshow('cropped', cropped)
+cv.waitKey()
+# bot_vision()
 
 
 # cv.imshow('What bot sees', visualise_board_state(board_state))
