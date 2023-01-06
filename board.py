@@ -181,7 +181,7 @@ class Detector:
           img[int(r*y_div):int((r+1)*y_div-1), int(c*x_div):int((c+1)*x_div-1)] = 255
     return img
 
-  def launch_bot_vision_window():
+  def real_time_state_detection(self):
     # Run once to detect board location at the start of the game when we have an empty board
     screenshot = pyautogui.screenshot()
     fullscreen = np.array(screenshot)
@@ -193,8 +193,8 @@ class Detector:
       fullscreen = np.array(screenshot) # Default behaviour is a RGB picture for pyautogui screen capture. Images in OpenCV are stored in BGR format.
       fullscreen = cv.cvtColor(fullscreen, cv.COLOR_RGB2GRAY)
       cropped = Detector.crop_board(top_left, bottom_right, fullscreen)
-      board = Detector.board_state(cropped)
-      board_visualisation = Detector.visualise_board_state(board)
+      board = Detector.board_state(self, cropped)
+      board_visualisation = Detector.visualise_board_state(self, board)
       cv.imshow('Original Board', cropped)
       cv.imshow('Detected Board State', board_visualisation)
       if cv.waitKey(1) == ord('q'): # Wait 1ms, press q to quit
@@ -203,3 +203,4 @@ class Detector:
 
 # launch_bot_vision_window()
 detector = Detector()
+detector.real_time_state_detection()
