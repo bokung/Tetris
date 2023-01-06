@@ -32,12 +32,9 @@ import copy
 
 class Detector:
 
-  ROWS = 20
-  COLUMNS = 10
-  
-  def __init__(self, rows=20, columns=10) -> None: # Default board size to 20x10
-    self.ROWS = rows
-    self.COLUMNS = columns
+  def __init__(self, ROWS=20, COLUMNS=10) -> None: # Default board size to 20x10
+    self.ROWS = ROWS
+    self.COLUMNS = COLUMNS
 
   # Size of template image matters, matchTemplate is just a 2d convolution, computing the difference using some function, it doesnt come with scaling capabilities unfortunately.
   # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
@@ -86,6 +83,7 @@ class Detector:
     # pyautogui.mouseInfo()
     cv.waitKey()
 
+  @staticmethod
   def lower_is_better_checker(match_template_mode):
     if (match_template_mode is cv.TM_SQDIFF or cv.TM_SQDIFF_NORMED):
       return True
@@ -101,7 +99,7 @@ class Detector:
     Use this to locate board when there are more than one board on the screen, e.g. in a 1v1 duel or a multiplayer lobby
     '''
     result = cv.matchTemplate(fullscreen, template, template_match_mode)
-    lower_is_better = lower_is_better_checker(template_match_mode)
+    lower_is_better = Detector.lower_is_better_checker(template_match_mode)
 
     # A lot of repeated code! Can cut down?
     if (lower_is_better):
@@ -146,17 +144,17 @@ class Detector:
     # cv.imshow('cropped', cropped_board)
     # cv.waitKey()
 
-  def board_state(cropped_board):
+  def board_state(self, cropped_board):
     '''
     Only works when we do it on low settings! 
     Internally implemented as a template matching problem and we are using the low quality square block as reference.
     Returns a (ROW, COLUMN) ndarray of booleans, True means block is filled, False means block is empty.
     '''
-    h, w = TEMPLATE_main_board.shape
-    y_div = h/ROWS
-    x_div = w/COLUMNS
-    board = np.full((ROWS, COLUMNS), True) # Initialise to true, board detector will set detected empty squares to false.
-    result = cv.matchTemplate(cropped_board, TEMPLATE_empty_low_quality_no_border, cv.TM_CCOEFF_NORMED)
+    h, w = Detector.TEMPLATE_main_board.shape
+    y_div = h/self.ROWS
+    x_div = w/self.COLUMNS
+    board = np.full((self.ROWS, self.COLUMNS), True) # Initialise to true, board detector will set detected empty squares to false.
+    result = cv.matchTemplate(cropped_board, Detector.TEMPLATE_empty_low_quality_no_border, cv.TM_CCOEFF_NORMED)
     # detected_empty = list(zip(*np.where(result <= 0.000001)[::-1])) # Returns a list of tuples of detected squares, for Squared difference comparison
     detected_empty = list(zip(*np.where(result >= 0.99)[::-1]))
     for point in detected_empty:
@@ -172,13 +170,13 @@ class Detector:
       board[r, c] = False
     return board
 
-  def visualise_board_state(board_state):
-    h, w = TEMPLATE_main_board.shape
-    y_div = h/ROWS
-    x_div = w/COLUMNS
-    img = np.zeros(TEMPLATE_main_board.shape)
-    for r in range(ROWS):
-      for c in range(COLUMNS):
+  def visualise_board_state(self, board_state):
+    h, w = Detector.TEMPLATE_main_board.shape
+    y_div = h/self.ROWS
+    x_div = w/self.COLUMNS
+    img = np.zeros(Detector.TEMPLATE_main_board.shape)
+    for r in range(self.ROWS):
+      for c in range(self.COLUMNS):
         if (board_state[r, c]):
           img[int(r*y_div):int((r+1)*y_div-1), int(c*x_div):int((c+1)*x_div-1)] = 255
     return img
@@ -188,15 +186,15 @@ class Detector:
     screenshot = pyautogui.screenshot()
     fullscreen = np.array(screenshot)
     fullscreen = cv.cvtColor(fullscreen, cv.COLOR_RGB2GRAY)
-    top_left, bottom_right = locate_player_board(TEMPLATE_main_board, fullscreen, 0.99, cv.TM_SQDIFF_NORMED)
+    top_left, bottom_right = Detector.locate_player_board(Detector.TEMPLATE_main_board, fullscreen, 0.99, cv.TM_SQDIFF_NORMED)
 
     while (True):
       screenshot = pyautogui.screenshot()
       fullscreen = np.array(screenshot) # Default behaviour is a RGB picture for pyautogui screen capture. Images in OpenCV are stored in BGR format.
       fullscreen = cv.cvtColor(fullscreen, cv.COLOR_RGB2GRAY)
-      cropped = crop_board(top_left, bottom_right, fullscreen)
-      board = board_state(cropped)
-      board_visualisation = visualise_board_state(board)
+      cropped = Detector.crop_board(top_left, bottom_right, fullscreen)
+      board = Detector.board_state(cropped)
+      board_visualisation = Detector.visualise_board_state(board)
       cv.imshow('Original Board', cropped)
       cv.imshow('Detected Board State', board_visualisation)
       if cv.waitKey(1) == ord('q'): # Wait 1ms, press q to quit
@@ -204,3 +202,4 @@ class Detector:
         break
 
 # launch_bot_vision_window()
+detector = Detector()
