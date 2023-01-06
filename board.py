@@ -38,7 +38,7 @@ class Detector:
 
   # Size of template image matters, matchTemplate is just a 2d convolution, computing the difference using some function, it doesnt come with scaling capabilities unfortunately.
   # To determine the full rectangle, take the dimensions of the board and add it to respective dimensions of the top left point of rectangle.
-  TEMPLATE_main_board = cv.imread('resources/main_board_template.png', cv.IMREAD_GRAYSCALE)
+  TEMPLATE_main_board = cv.imread('resources/main_board_with_border.png', cv.IMREAD_GRAYSCALE)
   TEMPLATE_empty_black = cv.imread('resources/empty_black.png', cv.IMREAD_GRAYSCALE)
   TEMPLATE_empty_white = cv.imread('resources/empty_white.png', cv.IMREAD_GRAYSCALE)
   TEMPLATE_empty_low_quality = cv.imread('resources/empty_low_quality.png', cv.IMREAD_GRAYSCALE)
@@ -47,6 +47,9 @@ class Detector:
   TEMPLATE_block_medium = cv.imread('resources/block_medium.png', cv.IMREAD_GRAYSCALE)
   TEMPLATE_block_dark = cv.imread('resources/block_dark.png', cv.IMREAD_GRAYSCALE)
   TEMPLATE_preview = cv.imread('resources/preview_template.png', cv.IMREAD_GRAYSCALE)
+
+  MASK_main_board = np.full(TEMPLATE_main_board.shape, fill_value=255, dtype="uint8")
+  cv.rectangle(MASK_main_board, (0, 5), (466, 921), 0, -1)
 
   test_duel = cv.imread('test/test_duel.png', cv.IMREAD_GRAYSCALE)
   test_empty = cv.imread('test/test_empty.png', cv.IMREAD_GRAYSCALE)
@@ -98,7 +101,7 @@ class Detector:
     '''
     Use this to locate board when there are more than one board on the screen, e.g. in a 1v1 duel or a multiplayer lobby
     '''
-    result = cv.matchTemplate(fullscreen, template, template_match_mode)
+    result = cv.matchTemplate(fullscreen, template, template_match_mode, mask=Detector.MASK_main_board)
     lower_is_better = Detector.lower_is_better_checker(template_match_mode)
 
     # A lot of repeated code! Can cut down?
@@ -201,6 +204,5 @@ class Detector:
         cv.destroyAllWindows()
         break
 
-# launch_bot_vision_window()
 detector = Detector()
 detector.real_time_state_detection()
